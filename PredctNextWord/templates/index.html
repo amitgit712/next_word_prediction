@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"
+    integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <title>Next Word Prediction</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#">Next Word Prediction</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+
+    <div class="card m-5 p-3 col-md-12 col-lg-6 col-sm-12 mx-auto">
+      <div id="msg">
+        
+      </div>
+      <form action="{% url 'app:home' %}" method="POST" id="inputForm">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="input_text" class="form-label">Enter at least 10 words for better result</label>
+          <input type="text" name="input_text" value="he will have to look into this thing and he" class="form-control" id="input_text" required>
+        </div>
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-primary">Get Predictions</button>
+        </div>
+      </form>
+    </div>
+    <div class="card m-5 p-3 col-md-12 col-lg-6 col-sm-12 mx-auto" id="res">
+      
+      
+    </div>
+  </div>
+
+  <script>
+    $("#inputForm").submit(function (e) {
+      e.preventDefault();
+      $.ajax({
+        type: "POST",
+        url: "{% url 'app:home' %}",
+        data: {
+          'input_text': $("#input_text").val() || 0,
+          'csrfmiddlewaretoken': '{{ csrf_token }}',
+        },
+
+        success: function (res) {
+          if (res.code != "KeyError") {
+          var resData = "<h4 class='text-center text-primary'>Predicted Words</h4>"
+           $('#res').html(`${resData}`+"<p class='text-center'>"+`${res.res}`+"</p>")
+          }
+          else {
+            $('#msg').html("<p class='text-center text-warning'>"+`${res.msg}`+"</p>")
+          }
+        },
+        error: function (res) {
+          console.log(res)
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
